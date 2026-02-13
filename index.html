@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Proposal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@500&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+  height:100vh;
+  background:radial-gradient(circle at top,#ffe5ec,#ffc2d1);
+  overflow:hidden;
+  position:relative;
+}
+
+/* Floating particles */
+.particle{
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:#ffffffaa;
+  border-radius:50%;
+  animation:floatUp linear infinite;
+}
+
+@keyframes floatUp{
+  from{transform:translateY(0);}
+  to{transform:translateY(-120vh);}
+}
+
+#app{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+  position:relative;
+  z-index:2;
+}
+
+.screen{
+  width:100%;
+  max-width:1100px;
+}
+
+.title{
+  font-family:'Great Vibes',cursive;
+  font-size:4.5rem;
+  color:#c9184a;
+}
+
+.subtitle{
+  margin-top:15px;
+  font-size:1.2rem;
+}
+
+button{
+  padding:14px 40px;
+  border:none;
+  border-radius:50px;
+  font-size:1.1rem;
+  cursor:pointer;
+  margin:15px;
+  transition:all .3s ease;
+}
+
+.yes{
+  background:#c9184a;
+  color:white;
+  transform:scale(1);
+}
+
+.no{
+  background:#ff4d6d;
+  color:white;
+  position:relative;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+}
+
+.back{
+  background:#c9184a;
+  color:white;
+}
+
+/* Gift cards */
+.gifts{
+  margin-top:50px;
+  display:flex;
+  gap:40px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.gift-card{
+  width:230px;
+  padding:30px;
+  border-radius:25px;
+  background:white;
+  box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  cursor:pointer;
+  transition:.4s ease;
+}
+
+.gift-card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 25px 50px rgba(0,0,0,0.25);
+}
+
+.gift-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.3rem;
+}
+
+.letter-frame{
+  margin-top:40px;
+  padding:40px;
+  background:#fff8f0;
+  border:8px double #c9184a;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  max-width:700px;
+  font-family:'Playfair Display',serif;
+  line-height:1.8;
+}
+
+/* Gallery */
+.gallery{
+  margin-top:40px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:25px;
+  max-height:60vh;
+  overflow:auto;
+}
+
+.frame{
+  background:white;
+  padding:10px;
+  border-radius:20px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
+
+.frame img{
+  width:100%;
+  height:250px;
+  object-fit:cover;
+  border-radius:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script>
+
+/* Particles */
+for(let i=0;i<30;i++){
+  const p=document.createElement("div");
+  p.className="particle";
+  p.style.left=Math.random()*100+"vw";
+  p.style.animationDuration=(5+Math.random()*5)+"s";
+  p.style.bottom="-10px";
+  document.body.appendChild(p);
+}
+
+const app=document.getElementById("app");
+
+let phrases=[
+"Nice try 😜","Hehe almost 😂","Not today 😏","Catch me first 👀",
+"Are you sure? 🤭","Try again 😆","Mission failed 😎",
+"Still thinking? 😌","That tickles 😝","Impossible 😈",
+"Too slow 😜","Focus 😂","Nopeee 😏","Hmmm 🤔",
+"Really? 😆","Almost got me 😎","Better luck next time 😜",
+"Think harder 😏","Hehehe 😈","Still no 😆",
+"You serious? 😂","Come onnn 😜","Try harder 😎",
+"Is that all? 😏","No chance 😝","Still trying? 😌",
+"Oops 😜","Keep going 😂","Nahi chalega 😎","Arey yaar 😆"
+];
+
+function showProposal(){
+
+app.innerHTML=`
+<div class="screen">
+  <div class="title">Hey Kalyani ❤️</div>
+  <div class="subtitle">Will you be my Valentine?</div>
+  <div id="btnRow" style="display:flex;justify-content:center;gap:20px;margin-top:30px;">
+    <button class="yes" id="yesBtn" onclick="showGifts()">YES 💍</button>
+    <button class="no" id="noBtn">No</button>
+  </div>
+</div>
+`;
+
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+
+let phraseIndex=0;
+let yesScale=1;
+let cooldown=false;
+
+requestAnimationFrame(()=>{
+  const rect=noBtn.getBoundingClientRect();
+  noBtn.style.position="fixed";
+  noBtn.style.left=rect.left+"px";
+  noBtn.style.top=rect.top+"px";
+});
+
+document.onmousemove=(e)=>{
+
+  if(cooldown) return;
+
+  const rect=noBtn.getBoundingClientRect();
+  const centerX=rect.left+rect.width/2;
+  const centerY=rect.top+rect.height/2;
+
+  const dx=centerX-e.clientX;
+  const dy=centerY-e.clientY;
+  const distance=Math.sqrt(dx*dx+dy*dy);
+
+  if(distance<130){
+
+    cooldown=true;
+
+    noBtn.innerText=phrases[phraseIndex];
+    phraseIndex=(phraseIndex+1)%phrases.length;
+
+    const angle=Math.atan2(dy,dx);
+
+    let newLeft=rect.left+Math.cos(angle)*160;
+    let newTop=rect.top+Math.sin(angle)*160;
+
+    newLeft=Math.max(0,Math.min(window.innerWidth-rect.width,newLeft));
+    newTop=Math.max(0,Math.min(window.innerHeight-rect.height,newTop));
+
+    noBtn.style.transition="left .3s ease, top .3s ease";
+    noBtn.style.left=newLeft+"px";
+    noBtn.style.top=newTop+"px";
+
+    yesScale+=0.05;
+    yesScale=Math.min(2.2,yesScale);
+    yesBtn.style.transform=`scale(${yesScale})`;
+
+    setTimeout(()=>cooldown=false,350);
+  }
+};
+}
+
+function showGifts(){
+document.onmousemove=null;
+app.innerHTML=`
+<div class="screen">
+<div class="title">Yayyyyyyyyyyyyy Lesssgooo Kalyaniiii💍</div>
+<div class="subtitle">Here's something for You</div>
+<div class="gifts">
+<div class="gift-card" onclick="showLetter()">
+<div class="gift-title">Letter</div>
+</div>
+<div class="gift-card" onclick="showGallery()">
+<div class="gift-title">Our Memories</div>
+</div>
+</div>
+</div>`;
+}
+
+function showLetter(){
+app.innerHTML=`
+<div class="screen">
+<div class="title">A Letter For You</div>
+<div class="letter-frame">
+My dearest Kalyani,<br><br>
+You are my calm, my chaos, my happiness.
+Every moment with you feels magical.
+I dont know ye sab kab hua, but i kept falling endlessly.
+I just feel so right with you, pehle kabhi nhi hua esa,
+You are someone who brings out my inner-child,
+I am just so into youuuuu.....
+Ha theeke banjaunga tere liye Abhishek Sharma, bass!!!
+</div>
+<button class="back" onclick="showGifts()">Back</button>
+</div>`;
+}
+
+function showGallery(){
+app.innerHTML=`
+<div class="screen">
+<div class="title">Our Memories</div>
+<div class="gallery" id="gallery"></div>
+<button class="back" onclick="showGifts()">Back</button>
+</div>`;
+
+const gallery=document.getElementById("gallery");
+for(let i=1;i<=32;i++){
+  const frame=document.createElement("div");
+  frame.className="frame";
+  frame.innerHTML=`<img src="photo${i}.jpeg">`;
+  gallery.appendChild(frame);
+}
+}
+
+showProposal();
+
+</script>
+</body>
+</html>
